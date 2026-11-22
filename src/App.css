@@ -585,27 +585,7 @@ h1 {
   .page-footer { align-items: flex-start; padding: 19px 4px 0; font-size: 9px; line-height: 1.5; }
 }
 
-.connection-state {
-  width: min(100% - 40px, 520px);
-  min-height: 100vh;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 14px;
-  color: #25332b;
-}
-.connection-state h1 { margin: 0; font-size: 34px; }
 .page-actions { display: flex; align-items: flex-start; gap: 9px; }
-.connection-state p { max-width: 500px; color: #647066; line-height: 1.65; }
-.connection-state code { padding: 2px 5px; border-radius: 5px; background: #eef1eb; font-size: .9em; }
-.user-email { max-width: 220px; overflow: hidden; color: #59675d; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
-.source-empty-state { display: flex; min-height: 264px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 15px; padding: 25px; }
-.source-empty-state h2 { margin: 6px 0; color: #29372e; font-size: 19px; }
-.source-empty-state p { max-width: 360px; margin: 0; color: #6a756d; font-size: 12px; line-height: 1.6; }
-.dashboard-error { margin: 0 0 14px; padding: 11px 13px; border-radius: 10px; background: #fff1ed; color: #914638; font-size: 12px; }
-.modal-form button:disabled { opacity: .55; cursor: wait; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
