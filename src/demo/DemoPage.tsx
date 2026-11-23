@@ -17,12 +17,20 @@ import {
 import '../App.css'
 import './DemoPage.css'
 
-// Fechas de vencimiento de ejemplo: dentro de 2, 5, 9, 12 y 16 días.
+// Fechas de vencimiento de ejemplo: cinco días repartidos entre hoy y el fin de este mes,
+// para que la demo muestre el mismo mes que el resto de la pantalla.
+function finDeMes() {
+  const hoy = new Date()
+  return new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0)
+}
+
 function sampleDates() {
-  return [2, 5, 9, 12, 16].map((days) => {
-    const date = new Date()
-    date.setDate(date.getDate() + days)
-    return dateInputValue(date)
+  const hoy = new Date()
+  const diasRestantes = finDeMes().getDate() - hoy.getDate()
+  return [1, 2, 3, 4, 5].map((numero) => {
+    const fecha = new Date()
+    fecha.setDate(hoy.getDate() + Math.round((diasRestantes * numero) / 5))
+    return dateInputValue(fecha)
   })
 }
 
@@ -138,8 +146,7 @@ export function DemoPage() {
             source={selectedSource}
             monthLabel={formatCurrentMonth()}
             onAdd={() => {
-              const due = new Date()
-              due.setDate(due.getDate() + 12)
+              const due = finDeMes()
               setBills((current) => [...current, {
                 id: `demo-bill-${Date.now()}`,
                 name: 'Cuenta de ejemplo',
