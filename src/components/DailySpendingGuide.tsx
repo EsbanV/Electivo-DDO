@@ -1,5 +1,6 @@
 import type { MoneySource } from '../data'
 import { formatCLP } from '../data'
+import { AnimatedAmount } from './AnimatedAmount'
 
 function getMonthWindow(date = new Date()) {
   const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
@@ -30,8 +31,8 @@ export function DailySpendingGuide({ available, source }: {
         <span className="daily-guide-tag">hasta fin de mes</span>
       </div>
 
-      <p className="daily-guide-amount" aria-live="polite">
-        <strong>{formatCLP(dailyAmount)}</strong>
+      <p className="daily-guide-amount">
+        <strong><AnimatedAmount value={dailyAmount} /></strong>
         <span>al día</span>
       </p>
       <p className="daily-guide-formula">

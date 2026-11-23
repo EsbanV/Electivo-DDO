@@ -1,4 +1,5 @@
 import type { Bill, MoneySource } from '../data'
+import { AnimatePresence, motion } from 'motion/react'
 import { formatCLP, formatShortDate } from '../data'
 import { Icon } from './Icon'
 
@@ -40,8 +41,14 @@ export function BillsPanel({ bills, source, onAdd, onTogglePaid }: BillsPanelPro
         ) : sortedBills.length === 0 ? (
           <p className="empty-state">Todavía no agregas cuentas para esta fuente.</p>
         ) : (
-          sortedBills.map((bill) => (
-            <article className={'bill-row' + (bill.paid ? ' is-paid' : '') + (!bill.paid && venceEnPocosDias(bill.dueDate) ? ' is-soon' : '')} key={bill.id}>
+          <AnimatePresence initial={false}>
+          {sortedBills.map((bill) => (
+            <motion.article
+              layout
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: bill.paid ? 0.5 : 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className={'bill-row' + (bill.paid ? ' is-paid' : '') + (!bill.paid && venceEnPocosDias(bill.dueDate) ? ' is-soon' : '')} key={bill.id}>
               <span className="bill-date">
                 <b>{Number(bill.dueDate.slice(8, 10))}</b>
                 <span>{formatShortDate(bill.dueDate).split(' ')[1]}</span>
@@ -63,8 +70,9 @@ export function BillsPanel({ bills, source, onAdd, onTogglePaid }: BillsPanelPro
                   {bill.paid ? 'Deshacer' : 'Marcar pagada'}
                 </button>
               </div>
-            </article>
-          ))
+            </motion.article>
+          ))}
+          </AnimatePresence>
         )}
       </div>
 

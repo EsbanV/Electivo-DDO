@@ -1,5 +1,6 @@
 import type { Bill, MoneySource } from '../data'
 import { formatCLP, formatShortDate } from '../data'
+import { AnimatedAmount } from './AnimatedAmount'
 import { Icon } from './Icon'
 
 const DIAS_REGLA = 30
@@ -84,7 +85,7 @@ export function BalancePanel({ source, bills, index, total, reserved, onPrevious
       </div>
 
       <p className="balance-label">{isBenefit ? 'Saldo del beneficio' : 'Libre después de tus cuentas'}</p>
-      <p className="available-amount" aria-live="polite" aria-atomic="true">{formatCLP(available)}</p>
+      <p className="available-amount"><AnimatedAmount value={available} /></p>
       <p className="balance-caption">
         {isBenefit
           ? (source.restriction || 'Uso restringido') + '. No se considera para pagar cuentas.'

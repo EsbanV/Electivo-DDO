@@ -274,7 +274,6 @@ h2 { font-family: var(--display); font-size: 18px; line-height: 1.2; letter-spac
   gap: 14px;
   padding: 14px 0;
   border-top: 1px solid var(--line);
-  transition: opacity 200ms ease;
 }
 .bill-row:first-child { border-top: 0; padding-top: 0; }
 
@@ -290,7 +289,6 @@ h2 { font-family: var(--display); font-size: 18px; line-height: 1.2; letter-spac
 .bill-trailing { display: flex; flex-direction: column; align-items: flex-end; }
 .bill-trailing strong { font-family: var(--display); font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
 
-.bill-row.is-paid { opacity: 0.5; }
 .bill-row.is-paid .bill-copy strong, .bill-row.is-paid .bill-trailing strong { text-decoration: line-through; }
 .bill-row.is-paid .bill-date b { color: var(--violet); }
 
