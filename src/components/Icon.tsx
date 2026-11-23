@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarCheck, Check, ChevronLeft, ChevronRight, Plus, Sparkles, Wallet, X } from 'lucide-react'
+import { ArrowRight, CalendarCheck, Check, ChevronLeft, ChevronRight, Plus, Wallet, X } from 'lucide-react'
 
 // Los nombres que usa la app apuntan a íconos de Lucide.
 const icons = {
@@ -7,7 +7,6 @@ const icons = {
   plus: Plus,
   check: Check,
   close: X,
-  sparkle: Sparkles,
   arrow: ArrowRight,
   'chevron-left': ChevronLeft,
   'chevron-right': ChevronRight,
