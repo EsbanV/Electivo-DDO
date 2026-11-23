@@ -1,9 +1,12 @@
 import type { Expense, ExpenseCategory } from '../data'
+import { useState } from 'react'
 import { motion } from 'motion/react'
+import { Paginador } from './Paginador'
 import { formatCLP } from '../data'
 import { InfoTip } from './InfoTip'
 
-const colors = ['aqua', 'sky', 'violet', 'coral']
+const CATEGORIAS_POR_PAGINA = 4
+const colors = ['aqua', 'sky', 'violet', 'coral', 'cyan', 'orchid']
 
 export function SpendingSummary({ expenses, categories, monthLabel }: {
   expenses: Expense[]
@@ -18,8 +21,15 @@ export function SpendingSummary({ expenses, categories, monthLabel }: {
       .filter((expense) => expense.categoryId === category.id)
       .reduce((sum, expense) => sum + expense.amount, 0),
   }))
+  const [pagina, setPagina] = useState(0)
   const total = totals.reduce((sum, category) => sum + category.total, 0)
   const smallPurchases = totals.find((category) => category.label === 'Compras pequeñas')?.total ?? 0
+
+  // Las categorías con más gasto van primero.
+  const ordenadas = [...totals].sort((a, b) => b.total - a.total)
+  const totalPaginas = Math.ceil(ordenadas.length / CATEGORIAS_POR_PAGINA)
+  const paginaActual = Math.min(pagina, Math.max(totalPaginas - 1, 0))
+  const categoriasDePagina = ordenadas.slice(paginaActual * CATEGORIAS_POR_PAGINA, (paginaActual + 1) * CATEGORIAS_POR_PAGINA)
 
   return (
     <section className="surface spending-panel" aria-labelledby="spending-title">
@@ -37,7 +47,7 @@ export function SpendingSummary({ expenses, categories, monthLabel }: {
       </div>
 
       <ul className="category-list">
-        {totals.map((category) => (
+        {categoriasDePagina.map((category) => (
           <li className="category-row" key={category.id}>
             <div className="category-head">
               <span className="category-label">
@@ -60,6 +70,7 @@ export function SpendingSummary({ expenses, categories, monthLabel }: {
           </li>
         ))}
       </ul>
+      <Paginador pagina={paginaActual} totalPaginas={totalPaginas} onCambiar={setPagina} />
     </section>
   )
 }

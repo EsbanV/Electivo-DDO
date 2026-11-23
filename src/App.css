@@ -263,7 +263,7 @@ h2 { font-family: var(--display); font-size: 16px; line-height: 1.2; letter-spac
 
 .count-pill { padding: 3px 12px; border-radius: 999px; background: var(--raised); box-shadow: var(--edge-light); color: var(--muted); font-size: 13px; white-space: nowrap; }
 
-.bill-list { display: flex; flex-direction: column; }
+.bill-list { display: flex; min-height: 268px; flex-direction: column; }
 .bill-row {
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) auto;
@@ -289,7 +289,7 @@ h2 { font-family: var(--display); font-size: 16px; line-height: 1.2; letter-spac
 .bill-row.is-paid .bill-copy strong, .bill-row.is-paid .bill-trailing strong { text-decoration: line-through; }
 .bill-row.is-paid .bill-date b { color: var(--violet); }
 
-.add-bill-button { margin-top: 18px; }
+.add-bill-button { align-self: flex-start; margin-top: 14px; }
 .empty-state { color: var(--muted); font-size: 14px; }
 
 .restricted-note { display: flex; gap: 12px; align-items: flex-start; color: var(--muted); font-size: 14px; }
@@ -374,6 +374,14 @@ h2 { font-family: var(--display); font-size: 16px; line-height: 1.2; letter-spac
 }
 .info-tip:hover .info-text, .info-tip:focus-within .info-text { opacity: 1; transform: none; }
 
+/* ---------- Paginación ---------- */
+
+.bills-panel, .spending-panel { display: flex; flex-direction: column; }
+.pager { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: auto; padding-top: 10px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.pager button { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; padding: 0; background: var(--raised); box-shadow: var(--edge-light); color: var(--text); cursor: pointer; transition: background-color 150ms ease; }
+.pager button:hover:not(:disabled) { background: rgba(160, 200, 255, 0.16); }
+.pager button:disabled { opacity: 0.35; cursor: default; }
+
 /* ---------- Gastos del mes ---------- */
 
 .month-label { color: var(--muted); font-size: 14px; }
@@ -382,7 +390,7 @@ h2 { font-family: var(--display); font-size: 16px; line-height: 1.2; letter-spac
 .small-spend-highlight span { color: var(--muted); font-size: 14px; }
 .small-spend-highlight strong { font-family: var(--display); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-.category-list { display: grid; gap: 12px; margin: 12px 0 0; padding: 0; list-style: none; }
+.category-list { display: grid; align-content: start; gap: 12px; min-height: 196px; margin: 12px 0 0; padding: 0; list-style: none; }
 .category-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 14px; }
 .category-label { display: flex; align-items: center; gap: 10px; }
 .category-amount { font-family: var(--display); font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -395,6 +403,8 @@ h2 { font-family: var(--display); font-size: 16px; line-height: 1.2; letter-spac
 .sky { background: linear-gradient(180deg, #8cc6ff, #4a90e2); }
 .violet { background: linear-gradient(180deg, #b4adff, #7a6fe6); }
 .coral { background: linear-gradient(180deg, #ffb59c, #ee7d5d); }
+.cyan { background: linear-gradient(180deg, #8fe3f2, #3aaec9); }
+.orchid { background: linear-gradient(180deg, #e3b0ec, #b46fc9); }
 
 /* ---------- Pie y estados ---------- */
 

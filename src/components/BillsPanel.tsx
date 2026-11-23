@@ -2,8 +2,10 @@ import type { Bill, MoneySource } from '../data'
 import { AnimatePresence, motion } from 'motion/react'
 import confetti from 'canvas-confetti'
 import { formatCLP, formatShortDate } from '../data'
+import { useState } from 'react'
 import { Icon } from './Icon'
 import { InfoTip } from './InfoTip'
+import { Paginador } from './Paginador'
 
 // Una cuenta es urgente si vence en 3 días o menos (o ya venció).
 function venceEnPocosDias(dueDate: string) {
@@ -25,6 +27,8 @@ function celebrar(boton: HTMLElement) {
   })
 }
 
+const CUENTAS_POR_PAGINA = 4
+
 type BillsPanelProps = {
   bills: Bill[]
   source: MoneySource
@@ -38,6 +42,10 @@ export function BillsPanel({ bills, source, onAdd, onTogglePaid }: BillsPanelPro
   const pendingCount = sourceBills.filter((bill) => !bill.paid).length
   const sortedBills = [...sourceBills].sort((a, b) => a.dueDate.localeCompare(b.dueDate))
   const isBenefit = source.kind === 'benefit'
+  const [pagina, setPagina] = useState(0)
+  const totalPaginas = Math.ceil(sortedBills.length / CUENTAS_POR_PAGINA)
+  const paginaActual = Math.min(pagina, Math.max(totalPaginas - 1, 0))
+  const billsDePagina = sortedBills.slice(paginaActual * CUENTAS_POR_PAGINA, (paginaActual + 1) * CUENTAS_POR_PAGINA)
 
   return (
     <section className="surface bills-panel" aria-labelledby="bills-title">
@@ -59,7 +67,7 @@ export function BillsPanel({ bills, source, onAdd, onTogglePaid }: BillsPanelPro
           <p className="empty-state">Todavía no agregas cuentas para esta fuente.</p>
         ) : (
           <AnimatePresence initial={false}>
-          {sortedBills.map((bill) => (
+          {billsDePagina.map((bill) => (
             <motion.article
               layout
               initial={{ opacity: 0, y: 8 }}
@@ -95,6 +103,7 @@ export function BillsPanel({ bills, source, onAdd, onTogglePaid }: BillsPanelPro
           </AnimatePresence>
         )}
       </div>
+      <Paginador pagina={paginaActual} totalPaginas={totalPaginas} onCambiar={setPagina} />
 
       {!isBenefit && source.canPayBills && (
         <>

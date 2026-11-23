@@ -215,6 +215,7 @@ function App() {
                 onNext={() => setSelectedSourceId(sources[(sourceIndex + 1) % sources.length].id)}
               />
               <BillsPanel
+                key={selectedSource.id}
                 bills={bills}
                 source={selectedSource}
                 onAdd={() => {
@@ -254,6 +255,7 @@ function App() {
                 }}
               />
               <SpendingSummary
+                key={selectedSource.id}
                 expenses={dashboard.expenses.filter((expense) => expense.sourceId === selectedSource.id)}
                 categories={dashboard.categories}
                 monthLabel={selectedSource.name + ' · ' + monthLabel}

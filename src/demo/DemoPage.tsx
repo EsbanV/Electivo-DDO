@@ -17,14 +17,13 @@ import {
 import '../App.css'
 import './DemoPage.css'
 
+// Fechas de vencimiento de ejemplo: dentro de 2, 5, 9, 12 y 16 días.
 function sampleDates() {
-  const first = new Date()
-  first.setDate(first.getDate() + 2)
-  const second = new Date()
-  second.setDate(second.getDate() + 5)
-  const third = new Date()
-  third.setDate(third.getDate() + 9)
-  return [dateInputValue(first), dateInputValue(second), dateInputValue(third)]
+  return [2, 5, 9, 12, 16].map((days) => {
+    const date = new Date()
+    date.setDate(date.getDate() + days)
+    return dateInputValue(date)
+  })
 }
 
 const sources: MoneySource[] = [
@@ -37,6 +36,8 @@ const categories: ExpenseCategory[] = [
   { id: 'demo-food', name: 'Colación', sortOrder: 1 },
   { id: 'demo-transport', name: 'Transporte', sortOrder: 2 },
   { id: 'demo-other', name: 'Otros', sortOrder: 3 },
+  { id: 'demo-fun', name: 'Entretención', sortOrder: 4 },
+  { id: 'demo-study', name: 'Material de estudio', sortOrder: 5 },
 ]
 
 const presets: QuickExpensePreset[] = [
@@ -48,11 +49,13 @@ const presets: QuickExpensePreset[] = [
 ]
 
 function initialBills(): Bill[] {
-  const [cellphoneDate, electricityDate, internetDate] = sampleDates()
+  const [cellphoneDate, electricityDate, internetDate, streamingDate, gymDate] = sampleDates()
   return [
     { id: 'demo-cellphone', name: 'Plan de celular', amount: 14990, dueDate: cellphoneDate, paid: false, sourceId: 'demo-bank', frequency: 'monthly' },
     { id: 'demo-electricity', name: 'Electricidad', amount: 18000, dueDate: electricityDate, paid: false, sourceId: 'demo-bank', frequency: 'monthly' },
     { id: 'demo-internet', name: 'Internet', amount: 12990, dueDate: internetDate, paid: false, sourceId: 'demo-bank', frequency: 'monthly' },
+    { id: 'demo-streaming', name: 'Streaming', amount: 6990, dueDate: streamingDate, paid: false, sourceId: 'demo-bank', frequency: 'monthly' },
+    { id: 'demo-gym', name: 'Gimnasio', amount: 19990, dueDate: gymDate, paid: false, sourceId: 'demo-bank', frequency: 'monthly' },
   ]
 }
 
@@ -63,6 +66,8 @@ function initialExpenses(): Expense[] {
     { id: 'demo-expense-2', label: 'Bebida', amount: 1500, categoryId: 'demo-small', sourceId: 'demo-bank', occurredAt: now },
     { id: 'demo-expense-3', label: 'Colación', amount: 3200, categoryId: 'demo-food', sourceId: 'demo-benefit', occurredAt: now },
     { id: 'demo-expense-4', label: 'Transporte', amount: 900, categoryId: 'demo-transport', sourceId: 'demo-bank', occurredAt: now },
+    { id: 'demo-expense-6', label: 'Cine', amount: 5500, categoryId: 'demo-fun', sourceId: 'demo-bank', occurredAt: now },
+    { id: 'demo-expense-7', label: 'Fotocopias', amount: 2100, categoryId: 'demo-study', sourceId: 'demo-bank', occurredAt: now },
     { id: 'demo-expense-5', label: 'Almuerzo', amount: 2800, categoryId: 'demo-food', sourceId: 'demo-benefit', occurredAt: now },
   ]
 }
@@ -128,6 +133,7 @@ export function DemoPage() {
             onNext={() => setSelectedSourceIndex((index) => (index + 1) % sources.length)}
           />
           <BillsPanel
+            key={selectedSource.id}
             bills={bills}
             source={selectedSource}
             monthLabel={formatCurrentMonth()}
@@ -167,6 +173,7 @@ export function DemoPage() {
             }}
           />
           <SpendingSummary
+            key={selectedSource.id}
             expenses={expenses.filter((expense) => expense.sourceId === selectedSource.id)}
             categories={categories}
             monthLabel={selectedSource.name + ' · ' + formatCurrentMonth()}
