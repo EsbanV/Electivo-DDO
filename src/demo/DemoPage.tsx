@@ -106,7 +106,6 @@ export function DemoPage() {
         <section className="page-intro" aria-labelledby="demo-title">
           <div>
             <h1 id="demo-title">Tu plata, con más claridad.</h1>
-            <p className="intro-copy">Una demo con datos ficticios: marca pagos, anota gastos y mira cómo cambia tu saldo libre.</p>
           </div>
           <button className="button button-quiet demo-reset" type="button" onClick={resetDemo}>Restablecer demo</button>
         </section>
