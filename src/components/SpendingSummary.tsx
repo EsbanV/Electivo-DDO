@@ -1,7 +1,7 @@
 import type { Expense, ExpenseCategory } from '../data'
 import { formatCLP } from '../data'
 
-const colors = ['mint', 'pink', 'violet', 'amber']
+const colors = ['aqua', 'sky', 'violet', 'coral']
 
 export function SpendingSummary({ expenses, categories, monthLabel }: {
   expenses: Expense[]
