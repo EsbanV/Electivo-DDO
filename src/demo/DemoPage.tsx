@@ -59,10 +59,11 @@ function initialBills(): Bill[] {
 function initialExpenses(): Expense[] {
   const now = new Date().toISOString()
   return [
-    { id: 'demo-expense-1', label: 'Chocolate', amount: 1200, categoryId: 'demo-small', occurredAt: now },
-    { id: 'demo-expense-2', label: 'Bebida', amount: 1500, categoryId: 'demo-small', occurredAt: now },
-    { id: 'demo-expense-3', label: 'Colación', amount: 3200, categoryId: 'demo-food', occurredAt: now },
-    { id: 'demo-expense-4', label: 'Transporte', amount: 900, categoryId: 'demo-transport', occurredAt: now },
+    { id: 'demo-expense-1', label: 'Chocolate', amount: 1200, categoryId: 'demo-small', sourceId: 'demo-bank', occurredAt: now },
+    { id: 'demo-expense-2', label: 'Bebida', amount: 1500, categoryId: 'demo-small', sourceId: 'demo-bank', occurredAt: now },
+    { id: 'demo-expense-3', label: 'Colación', amount: 3200, categoryId: 'demo-food', sourceId: 'demo-benefit', occurredAt: now },
+    { id: 'demo-expense-4', label: 'Transporte', amount: 900, categoryId: 'demo-transport', sourceId: 'demo-bank', occurredAt: now },
+    { id: 'demo-expense-5', label: 'Almuerzo', amount: 2800, categoryId: 'demo-food', sourceId: 'demo-benefit', occurredAt: now },
   ]
 }
 
@@ -159,12 +160,17 @@ export function DemoPage() {
                 label,
                 amount,
                 categoryId,
+                sourceId: selectedSource.id,
                 occurredAt: new Date().toISOString(),
               }, ...current])
               setMessage('Gasto agregado a la vista de muestra; no se guardó en una cuenta.')
             }}
           />
-          <SpendingSummary expenses={expenses} categories={categories} monthLabel={formatCurrentMonth()} />
+          <SpendingSummary
+            expenses={expenses.filter((expense) => expense.sourceId === selectedSource.id)}
+            categories={categories}
+            monthLabel={selectedSource.name + ' · ' + formatCurrentMonth()}
+          />
         </div>
 
         <footer className="page-footer demo-footer">

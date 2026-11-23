@@ -28,6 +28,7 @@ export type Expense = {
   label: string
   amount: number
   categoryId: string
+  sourceId: string
   occurredAt: string
 }
 

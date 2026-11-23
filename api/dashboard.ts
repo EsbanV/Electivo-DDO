@@ -17,7 +17,7 @@ export const GET = withUser(async (_request, { db }) => {
     db.from('expense_categories').select('id, name, sort_order').eq('is_active', true).order('sort_order'),
     db.from('quick_presets').select('id, label, category_id').eq('is_active', true).order('sort_order'),
     db.from('bill_occurrences').select('id, name, amount, due_on, status, money_source_id, rule_id').eq('period_month', period).neq('status', 'skipped').order('due_on'),
-    db.from('expenses').select('id, label, amount, category_id, occurred_at').gte('occurred_at', from.toISOString()).lt('occurred_at', to.toISOString()).order('occurred_at', { ascending: false }),
+    db.from('expenses').select('id, label, amount, category_id, money_source_id, occurred_at').gte('occurred_at', from.toISOString()).lt('occurred_at', to.toISOString()).order('occurred_at', { ascending: false }),
   ])
 
   for (const result of [sourcesResult, snapshotsResult, categoriesResult, presetsResult, billsResult, expensesResult]) {
@@ -67,6 +67,7 @@ export const GET = withUser(async (_request, { db }) => {
       label: expense.label,
       amount: Number(expense.amount),
       categoryId: expense.category_id,
+      sourceId: expense.money_source_id ?? '',
       occurredAt: expense.occurred_at,
     })),
   }

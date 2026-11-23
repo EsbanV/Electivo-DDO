@@ -245,13 +245,21 @@ function App() {
             </section>
           )}
 
-          <QuickExpensePanel
-            presets={dashboard.presets}
-            onAdd={async (expense) => {
-              if (!await save(() => addExpense(expense))) throw new Error(error || 'No se pudo guardar el gasto.')
-            }}
-          />
-          <SpendingSummary expenses={dashboard.expenses} categories={dashboard.categories} monthLabel={monthLabel} />
+          {selectedSource && (
+            <>
+              <QuickExpensePanel
+                presets={dashboard.presets}
+                onAdd={async (expense) => {
+                  if (!await save(() => addExpense({ ...expense, sourceId: selectedSource.id }))) throw new Error(error || 'No se pudo guardar el gasto.')
+                }}
+              />
+              <SpendingSummary
+                expenses={dashboard.expenses.filter((expense) => expense.sourceId === selectedSource.id)}
+                categories={dashboard.categories}
+                monthLabel={selectedSource.name + ' · ' + monthLabel}
+              />
+            </>
+          )}
         </div>
 
         <footer className="page-footer">

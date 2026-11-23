@@ -41,7 +41,7 @@ export function QuickExpensePanel({ presets, onAdd }: QuickExpensePanelProps) {
       <div className="section-heading">
         <div>
           <h2 id="quick-title">Anota un gasto</h2>
-          <InfoTip text="Registra un gasto en dos toques: elige qué fue y escribe el monto. Se agrupa por categoría." />
+          <InfoTip text="Registra un gasto en dos toques: elige qué fue y escribe el monto. Se suma a la cuenta o beneficio que tienes seleccionado arriba y se agrupa por categoría." />
         </div>
       </div>
 

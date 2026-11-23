@@ -38,7 +38,7 @@ export const addMoneySource = (input: {
 export const updateBalance = (sourceId: string, amount: number) =>
   request('/api/balances', 'POST', { sourceId, amount })
 
-export const addExpense = (input: { label: string; amount: number; categoryId: string; presetId: string }) =>
+export const addExpense = (input: { label: string; amount: number; categoryId: string; presetId: string; sourceId: string }) =>
   request('/api/expenses', 'POST', input)
 
 export const setBillPaid = (billId: string, paid: boolean) =>
