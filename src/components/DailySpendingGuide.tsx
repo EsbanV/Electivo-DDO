@@ -25,15 +25,14 @@ export function DailySpendingGuide({ available, source }: {
     <section className="surface daily-guide" aria-labelledby="daily-guide-title">
       <div className="daily-guide-heading">
         <div>
-          <div className="eyebrow">HASTA FIN DE MES</div>
-          <h2 id="daily-guide-title">Ritmo diario sugerido</h2>
+          <h2 id="daily-guide-title">Para gastar cada día</h2>
         </div>
-        <span className="daily-guide-tag">Orientativo</span>
+        <span className="daily-guide-tag">hasta fin de mes</span>
       </div>
 
       <p className="daily-guide-amount" aria-live="polite">
         <strong>{formatCLP(dailyAmount)}</strong>
-        <span>por día</span>
+        <span>al día</span>
       </p>
       <p className="daily-guide-formula">
         {hasShortfall

@@ -105,22 +105,22 @@ export function DemoPage() {
       <main id="resumen" className="main-content demo-content">
         <section className="page-intro" aria-labelledby="demo-title">
           <div>
-            <p className="eyebrow intro-eyebrow">DEMO INTERACTIVA <span className="intro-dot">•</span> DATOS FICTICIOS</p>
             <h1 id="demo-title">Tu plata, con más claridad.</h1>
-            <p className="intro-copy">Explora cómo Saldo Claro ayuda a anticipar pagos y registrar gastos cotidianos.</p>
+            <p className="intro-copy">Una demo con datos ficticios: marca pagos, anota gastos y mira cómo cambia tu saldo libre.</p>
           </div>
           <button className="button button-quiet demo-reset" type="button" onClick={resetDemo}>Restablecer demo</button>
         </section>
 
         <div className="demo-notice" role="note">
-          <strong>Estás en una versión de muestra.</strong>
-          <span>Prueba el carrusel, marca pagos y anota gastos. Tus cambios son temporales y no se guardan en ninguna cuenta.</span>
+          <strong>Versión de muestra.</strong>
+          <span>Tus cambios son temporales y no se guardan en ninguna cuenta.</span>
         </div>
         {message && <p className="demo-feedback" role="status">{message}</p>}
 
         <div className="dashboard-grid">
           <BalancePanel
             source={selectedSource}
+            bills={sourceBills}
             index={selectedSourceIndex}
             total={sources.length}
             reserved={reserved}
@@ -170,7 +170,7 @@ export function DemoPage() {
 
         <footer className="page-footer demo-footer">
           <span className="footer-lock" aria-hidden="true">●</span>
-          Valores de ejemplo para mostrar el flujo. No representan información financiera real.
+          Valores de ejemplo. No representan información financiera real.
         </footer>
       </main>
     </div>

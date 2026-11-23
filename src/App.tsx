@@ -62,8 +62,9 @@ function App() {
   const selectedSource: MoneySource | undefined = sources.find((source) => source.id === selectedSourceId) ?? sources[0]
   const sourceIndex = sources.indexOf(selectedSource!)
   const bills = dashboard?.bills ?? []
+  const sourceBills = selectedSource ? bills.filter((bill) => bill.sourceId === selectedSource.id) : []
   const reserved = selectedSource?.canPayBills
-    ? bills.filter((bill) => bill.sourceId === selectedSource.id && !bill.paid).reduce((sum, bill) => sum + bill.amount, 0)
+    ? sourceBills.filter((bill) => !bill.paid).reduce((sum, bill) => sum + bill.amount, 0)
     : 0
   const monthLabel = formatCurrentMonth()
 
@@ -136,7 +137,6 @@ function App() {
     return (
       <main className="connection-state">
         <span className="brand-mark"><Icon name="wallet" size={19} /></span>
-        <p className="eyebrow">SALDO CLARO</p>
         <h1>Conecta la base de datos</h1>
         <p>Configura la URL y la clave pública de tu proyecto Supabase en <code>.env.local</code>.</p>
       </main>
@@ -173,9 +173,8 @@ function App() {
       <main id="resumen" className="main-content">
         <section className="page-intro" aria-labelledby="page-title">
           <div>
-            <p className="eyebrow intro-eyebrow">{monthLabel.toLocaleUpperCase('es-CL')} <span className="intro-dot">•</span> TU RESUMEN</p>
-            <h1 id="page-title">Tu plata, con más claridad.</h1>
-            <p className="intro-copy">Separa lo que ya tiene destino de lo que puedes usar con tranquilidad.</p>
+            <h1 id="page-title">{monthLabel.charAt(0).toLocaleUpperCase('es-CL') + monthLabel.slice(1)}</h1>
+            <p className="intro-copy">Lo que ya tiene destino, separado de lo que puedes usar.</p>
           </div>
           <div className="page-actions">
             {selectedSource && <button type="button" className="button button-quiet" onClick={() => {
@@ -208,6 +207,7 @@ function App() {
             <>
               <BalancePanel
                 source={selectedSource}
+                bills={sourceBills}
                 index={sourceIndex}
                 total={sources.length}
                 reserved={reserved}
@@ -217,7 +217,6 @@ function App() {
               <BillsPanel
                 bills={bills}
                 source={selectedSource}
-                monthLabel={monthLabel}
                 onAdd={() => {
                   setBillDate(dateInputValue())
                   setBillFrequency('monthly')
@@ -237,7 +236,6 @@ function App() {
             <section className="surface source-empty-state">
               <span className="decorative-icon"><Icon name="wallet" size={21} /></span>
               <div>
-                <div className="eyebrow">PRIMER PASO</div>
                 <h2>Agrega una cuenta o beneficio</h2>
                 <p>Ingresa el saldo manualmente. No conectamos con tu banco ni guardamos datos de tarjetas.</p>
               </div>
@@ -258,7 +256,7 @@ function App() {
 
         <footer className="page-footer">
           <span className="footer-lock" aria-hidden="true">●</span>
-          Tus registros se guardan en tu cuenta y se ingresan manualmente.
+          Tus registros se guardan en tu cuenta y los ingresas tú.
         </footer>
       </main>
 
@@ -272,9 +270,6 @@ function App() {
         >
           <div className="modal-heading">
             <div>
-              <p className="eyebrow">
-                {dialog === 'bill' ? 'CUENTAS DEL MES' : dialog === 'source' ? 'NUEVA FUENTE' : 'SALDO DE REFERENCIA'}
-              </p>
               <h2 id="dialog-title">
                 {dialog === 'bill' ? 'Agregar una cuenta' : dialog === 'source' ? 'Agregar cuenta o beneficio' : 'Actualizar tu saldo'}
               </h2>

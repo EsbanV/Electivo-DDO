@@ -40,12 +40,11 @@ export function QuickExpensePanel({ presets, onAdd }: QuickExpensePanelProps) {
     <section className="surface quick-panel" aria-labelledby="quick-title">
       <div className="section-heading">
         <div>
-          <div className="eyebrow">SIN FORMULARIOS LARGOS</div>
-          <h2 id="quick-title">Anota un gasto rápido</h2>
+          <h2 id="quick-title">Anota un gasto</h2>
         </div>
         <span className="decorative-icon"><Icon name="sparkle" size={20} /></span>
       </div>
-      <p className="section-description">Elige algo habitual y escribe solo el monto.</p>
+      <p className="section-description">Elige qué fue y escribe el monto.</p>
 
       <div className="quick-choices" role="group" aria-label="Tipo de gasto">
         {presets.map((item) => (
@@ -86,7 +85,7 @@ export function QuickExpensePanel({ presets, onAdd }: QuickExpensePanelProps) {
           {isSaving ? 'Guardando…' : 'Guardar'}
         </button>
       </form>
-      <p className="form-message" aria-live="polite">{message || (presets.length ? 'El detalle queda agrupado por categoría.' : 'No hay accesos rápidos configurados.')}</p>
+      <p className="form-message" aria-live="polite">{message || (presets.length ? 'Queda agrupado por categoría.' : 'No hay accesos rápidos configurados.')}</p>
     </section>
   )
 }

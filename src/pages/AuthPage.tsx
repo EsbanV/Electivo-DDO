@@ -74,17 +74,14 @@ export function AuthPage() {
 
       <div className="auth-layout">
         <section className="auth-story" aria-label="Sobre Saldo Claro">
-          <div className="auth-story-main">
-            <span className="auth-story-kicker">TRANQUILIDAD, PASO A PASO</span>
-            <h1>Que tus cuentas no te tomen por sorpresa.</h1>
-            <p>Ten tus saldos, pagos próximos y gastos cotidianos en un solo lugar.</p>
-            <div className="auth-story-points">
-              <span><i aria-hidden="true">✓</i> Una vista simple de tu dinero</span>
-              <span><i aria-hidden="true">✓</i> Cuentas organizadas por fuente</span>
-            </div>
-          </div>
-          <p className="auth-story-footer">Un espacio para ordenar, sin juicios.</p>
-          <span className="auth-decoration" aria-hidden="true">✳</span>
+          <h1>Que tus cuentas no te tomen por sorpresa.</h1>
+          <p>Tu saldo libre, tus pagos próximos y tus gastos del día en un solo lugar.</p>
+          {/* Decoración: la regla de 30 días que se ve en el resumen */}
+          <ol className="auth-ruler" aria-hidden="true">
+            {Array.from({ length: 30 }, (_, dia) => (
+              <li className={dia === 0 ? 'today' : dia === 6 || dia === 17 || dia === 24 ? 'bill' : ''} key={dia} style={{ '--i': dia } as React.CSSProperties} />
+            ))}
+          </ol>
         </section>
 
         <section className="auth-form-side">
@@ -113,11 +110,10 @@ export function AuthPage() {
               </button>
             </div>
 
-            <p className="eyebrow auth-eyebrow">{isRegister ? 'EMPIEZA EN UN MOMENTO' : 'QUÉ BUENO VERTE'}</p>
             <h2 id="auth-title">{isRegister ? 'Crea tu cuenta' : 'Inicia sesión'}</h2>
             <p className="auth-intro">
               {isRegister
-                ? 'Prepara un espacio sencillo para organizar tu plata.'
+                ? 'Un espacio simple para ordenar tu plata.'
                 : 'Vuelve a tu resumen y revisa qué cuentas vienen.'}
             </p>
 
