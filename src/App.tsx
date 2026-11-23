@@ -15,7 +15,6 @@ import {
   updateBalance,
 } from './lib/budget-api'
 import { isSupabaseConfigured, requireSupabase } from './lib/supabase'
-import { clientDiagnostics, describeError } from './lib/client-diagnostics'
 import { dateInputValue, formatCurrentMonth, type MoneySource } from './data'
 import './App.css'
 
@@ -23,12 +22,9 @@ type Dialog = 'source' | 'balance' | 'bill' | null
 type DashboardData = Awaited<ReturnType<typeof loadDashboard>>
 
 function App() {
-  const [userId, setUserId] = useState<string | null>(null)
   const [userEmail, setUserEmail] = useState('')
-  const [isCheckingSession, setIsCheckingSession] = useState(isSupabaseConfigured)
   const [dashboard, setDashboard] = useState<DashboardData | null>(null)
-  const [loadError, setLoadError] = useState('')
-  const [actionError, setActionError] = useState('')
+  const [error, setError] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [selectedSourceId, setSelectedSourceId] = useState('')
   const [dialog, setDialog] = useState<Dialog>(null)
@@ -40,60 +36,21 @@ function App() {
   const [sourceName, setSourceName] = useState('')
   const [sourceKind, setSourceKind] = useState<'bank_account' | 'benefit'>('bank_account')
   const [sourceBalance, setSourceBalance] = useState('')
-  const [sourceCanPayBills, setSourceCanPayBills] = useState(true)
   const [sourceRestriction, setSourceRestriction] = useState('')
   const dialogRef = useRef<HTMLDialogElement>(null)
 
+  // Al abrir la página: exige sesión y carga los datos del usuario.
   useEffect(() => {
     if (!isSupabaseConfigured) return
-
-    const client = requireSupabase()
-    let isCurrent = true
-    const { data: authListener } = client.auth.onAuthStateChange((_event, session) => {
-      if (!isCurrent) return
-      if (!session) {
-        clientDiagnostics.warn('auth.session_missing', { route: 'dashboard', mode: 'supabase' })
+    requireSupabase().auth.getSession().then(async ({ data }) => {
+      if (!data.session) {
         window.location.assign('/auth/')
         return
       }
-      setUserId(session.user.id)
-      setUserEmail(session.user.email ?? '')
-      setIsCheckingSession(false)
-    })
-
-    client.auth.getSession().then(({ data, error }) => {
-      if (!isCurrent) return
-      if (error || !data.session) {
-        if (error) clientDiagnostics.error('auth.session_check_failed', describeError(error))
-        else clientDiagnostics.warn('auth.session_missing', { route: 'dashboard', mode: 'supabase' })
-        window.location.assign('/auth/')
-        return
-      }
-      setUserId(data.session.user.id)
       setUserEmail(data.session.user.email ?? '')
-      setIsCheckingSession(false)
-    })
-
-    return () => {
-      isCurrent = false
-      authListener.subscription.unsubscribe()
-    }
+      setDashboard(await loadDashboard())
+    }).catch((cause: Error) => setError(cause.message))
   }, [])
-
-  useEffect(() => {
-    if (!userId) return
-    let isCurrent = true
-    loadDashboard()
-      .then((result) => {
-        if (isCurrent) {
-          setDashboard(result)
-        }
-      })
-      .catch((error: unknown) => {
-        if (isCurrent) setLoadError(error instanceof Error ? error.message : 'No se pudieron cargar tus datos.')
-      })
-    return () => { isCurrent = false }
-  }, [userId])
 
   useEffect(() => {
     const element = dialogRef.current
@@ -103,102 +60,76 @@ function App() {
 
   const sources = dashboard?.sources ?? []
   const selectedSource: MoneySource | undefined = sources.find((source) => source.id === selectedSourceId) ?? sources[0]
-  const sourceIndex = selectedSource ? sources.findIndex((source) => source.id === selectedSource.id) : -1
+  const sourceIndex = sources.indexOf(selectedSource!)
   const bills = dashboard?.bills ?? []
-  const expenses = dashboard?.expenses ?? []
-  const categories = dashboard?.categories ?? []
-  const presets = dashboard?.presets ?? []
-  const sourceBills = selectedSource ? bills.filter((bill) => bill.sourceId === selectedSource.id) : []
   const reserved = selectedSource?.canPayBills
-    ? sourceBills.filter((bill) => !bill.paid).reduce((sum, bill) => sum + bill.amount, 0)
+    ? bills.filter((bill) => bill.sourceId === selectedSource.id && !bill.paid).reduce((sum, bill) => sum + bill.amount, 0)
     : 0
   const monthLabel = formatCurrentMonth()
 
-  async function refreshDashboard() {
-    if (!userId) return
-    setDashboard(await loadDashboard())
-  }
-
-  async function runAction(action: () => Promise<void>) {
-    setActionError('')
+  // Ejecuta un cambio en el servidor y vuelve a cargar los datos.
+  // Devuelve true si salió bien.
+  async function save(action: () => Promise<unknown>) {
+    setError('')
     setIsSaving(true)
     try {
       await action()
-      await refreshDashboard()
-    } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'No se pudo guardar el cambio.')
-      throw error
+      setDashboard(await loadDashboard())
+      return true
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'No se pudo guardar el cambio.')
+      return false
     } finally {
       setIsSaving(false)
     }
   }
 
+  function closeDialog() {
+    setDialog(null)
+    setError('')
+  }
+
   async function signOut() {
-    try {
-      const { error } = await requireSupabase().auth.signOut()
-      if (error) throw error
-    } catch (error) {
-      clientDiagnostics.error('auth.signout_failed', describeError(error))
-      setActionError('No pudimos cerrar sesión. Inténtalo de nuevo.')
-    }
+    await requireSupabase().auth.signOut()
+    window.location.assign('/auth/')
   }
 
   async function submitSource(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const parsedBalance = Number(sourceBalance)
-    if (!userId || !sourceName.trim() || !Number.isFinite(parsedBalance) || parsedBalance < 0) {
-      setActionError('Ingresa un nombre y un saldo igual o mayor que cero.')
-      return
-    }
-    try {
-      await runAction(() => addMoneySource({
-        name: sourceName,
-        kind: sourceKind,
-        balance: parsedBalance,
-        canPayBills: sourceKind === 'benefit' ? sourceCanPayBills : true,
-        restriction: sourceRestriction,
-      }))
-      setSourceName('')
-      setSourceBalance('')
-      setSourceRestriction('')
-      setSourceKind('bank_account')
-      setSourceCanPayBills(true)
-      setDialog(null)
-    } catch { /* El mensaje queda visible junto al formulario. */ }
+    const saved = await save(() => addMoneySource({
+      name: sourceName,
+      kind: sourceKind,
+      balance: Number(sourceBalance),
+      canPayBills: sourceKind === 'bank_account',
+      restriction: sourceRestriction,
+    }))
+    if (!saved) return
+    setSourceName('')
+    setSourceBalance('')
+    setSourceRestriction('')
+    setSourceKind('bank_account')
+    setDialog(null)
   }
 
   async function submitBalance(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const amount = Number(balanceInput)
-    if (!userId || !selectedSource || !Number.isFinite(amount) || amount < 0) {
-      setActionError('Ingresa un saldo igual o mayor que cero.')
-      return
-    }
-    try {
-      await runAction(() => updateBalance(selectedSource.id, amount))
-      setDialog(null)
-    } catch { /* El mensaje queda visible junto al formulario. */ }
+    if (selectedSource && await save(() => updateBalance(selectedSource.id, Number(balanceInput)))) setDialog(null)
   }
 
   async function submitBill(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const amount = Number(billAmount)
-    if (!userId || !selectedSource || !billName.trim() || !Number.isFinite(amount) || amount <= 0) {
-      setActionError('Completa el nombre y un monto mayor que cero.')
-      return
-    }
-    try {
-      await runAction(() => addBill({
-        name: billName,
-        amount,
-        dueOn: billDate,
-        sourceId: selectedSource.id,
-        frequency: billFrequency,
-      }))
-      setBillName('')
-      setBillAmount('')
-      setDialog(null)
-    } catch { /* El mensaje queda visible junto al formulario. */ }
+    if (!selectedSource) return
+    const saved = await save(() => addBill({
+      name: billName,
+      amount: Number(billAmount),
+      dueOn: billDate,
+      sourceId: selectedSource.id,
+      frequency: billFrequency,
+    }))
+    if (!saved) return
+    setBillName('')
+    setBillAmount('')
+    setDialog(null)
   }
 
   if (!isSupabaseConfigured) {
@@ -207,24 +138,16 @@ function App() {
         <span className="brand-mark"><Icon name="wallet" size={19} /></span>
         <p className="eyebrow">SALDO CLARO</p>
         <h1>Conecta la base de datos</h1>
-        <p>Configura la URL y la clave pública de tu proyecto Supabase en <code>.env.local</code> para activar el acceso y guardar información.</p>
-        <a className="button button-primary" href="/auth/">Ir a autenticación</a>
+        <p>Configura la URL y la clave pública de tu proyecto Supabase en <code>.env.local</code>.</p>
       </main>
     )
   }
 
-  if (isCheckingSession || (Boolean(userId) && !dashboard && !loadError)) {
-    return <main className="connection-state"><span className="brand-mark"><Icon name="wallet" size={19} /></span><p>Cargando tu espacio…</p></main>
-  }
-
-  if (loadError && !dashboard) {
+  if (!dashboard) {
     return (
       <main className="connection-state">
         <span className="brand-mark"><Icon name="wallet" size={19} /></span>
-        <p className="eyebrow">NO SE PUDIERON CARGAR LOS DATOS</p>
-        <h1>Revisa la conexión</h1>
-        <p role="alert">{loadError}</p>
-        <button className="button button-primary" type="button" onClick={() => window.location.reload()}>Intentar de nuevo</button>
+        <p role={error ? 'alert' : undefined}>{error || 'Cargando tu espacio…'}</p>
       </main>
     )
   }
@@ -256,18 +179,15 @@ function App() {
           </div>
           <div className="page-actions">
             {selectedSource && <button type="button" className="button button-quiet" onClick={() => {
-              setActionError('')
               setSourceName('')
               setSourceBalance('')
               setSourceKind('bank_account')
-              setSourceCanPayBills(true)
               setSourceRestriction('')
               setDialog('source')
             }}>
               <Icon name="plus" size={17} /> Agregar fuente
             </button>}
             <button type="button" className="button button-quiet" onClick={() => {
-              setActionError('')
               if (selectedSource) {
                 setBalanceInput(String(selectedSource.balance))
                 setDialog('balance')
@@ -281,7 +201,7 @@ function App() {
           </div>
         </section>
 
-        {(actionError || loadError) && <p className="dashboard-error" role="alert">{actionError || loadError}</p>}
+                {error && !dialog && <p className="dashboard-error" role="alert">{error}</p>}
 
         <div className="dashboard-grid">
           {selectedSource ? (
@@ -299,14 +219,13 @@ function App() {
                 source={selectedSource}
                 monthLabel={monthLabel}
                 onAdd={() => {
-                  setActionError('')
                   setBillDate(dateInputValue())
                   setBillFrequency('monthly')
                   setDialog('bill')
                 }}
                 onTogglePaid={(id) => {
                   const bill = bills.find((item) => item.id === id)
-                  if (userId && bill) void runAction(() => setBillPaid(id, !bill.paid)).catch(() => undefined)
+                  if (bill) void save(() => setBillPaid(id, !bill.paid))
                 }}
               />
               <DailySpendingGuide
@@ -329,13 +248,12 @@ function App() {
           )}
 
           <QuickExpensePanel
-            presets={presets}
+            presets={dashboard.presets}
             onAdd={async (expense) => {
-              if (!userId) throw new Error('Tu sesión ya no está activa. Vuelve a iniciar sesión.')
-              await runAction(() => addExpense(expense))
+              if (!await save(() => addExpense(expense))) throw new Error(error || 'No se pudo guardar el gasto.')
             }}
           />
-          <SpendingSummary expenses={expenses} categories={categories} monthLabel={monthLabel} />
+          <SpendingSummary expenses={dashboard.expenses} categories={dashboard.categories} monthLabel={monthLabel} />
         </div>
 
         <footer className="page-footer">
@@ -349,8 +267,8 @@ function App() {
           ref={dialogRef}
           className="modal"
           aria-labelledby="dialog-title"
-          onCancel={(event) => { event.preventDefault(); setDialog(null); setActionError('') }}
-          onClick={(event) => { if (event.target === event.currentTarget) { setDialog(null); setActionError('') } }}
+          onCancel={(event) => { event.preventDefault(); closeDialog() }}
+          onClick={(event) => { if (event.target === event.currentTarget) closeDialog() }}
         >
           <div className="modal-heading">
             <div>
@@ -361,7 +279,7 @@ function App() {
                 {dialog === 'bill' ? 'Agregar una cuenta' : dialog === 'source' ? 'Agregar cuenta o beneficio' : 'Actualizar tu saldo'}
               </h2>
             </div>
-            <button className="icon-button" type="button" onClick={() => { setDialog(null); setActionError('') }} aria-label="Cerrar">
+            <button className="icon-button" type="button" onClick={closeDialog} aria-label="Cerrar">
               <Icon name="close" size={19} />
             </button>
           </div>
@@ -370,11 +288,7 @@ function App() {
             <form className="modal-form" onSubmit={submitSource}>
               <label>Nombre<input autoFocus value={sourceName} onChange={(event) => setSourceName(event.target.value)} placeholder="Ej. Cuenta principal" required /></label>
               <label>Tipo de fuente
-                <select value={sourceKind} onChange={(event) => {
-                  const kind = event.target.value as 'bank_account' | 'benefit'
-                  setSourceKind(kind)
-                  setSourceCanPayBills(kind === 'bank_account')
-                }}>
+                <select value={sourceKind} onChange={(event) => setSourceKind(event.target.value as 'bank_account' | 'benefit')}>
                   <option value="bank_account">Cuenta bancaria</option>
                   <option value="benefit">Beneficio</option>
                 </select>
@@ -382,16 +296,10 @@ function App() {
               <label>Saldo actual
                 <span className="modal-input-wrap"><span>$</span><input type="number" min="0" step="1" value={sourceBalance} onChange={(event) => setSourceBalance(event.target.value)} placeholder="0" required /></span>
               </label>
-              {sourceKind === 'benefit' && <>
-                <label>¿Puede pagar cuentas?
-                  <select value={sourceCanPayBills ? 'yes' : 'no'} onChange={(event) => setSourceCanPayBills(event.target.value === 'yes')}>
-                    <option value="no">No, tiene uso restringido</option>
-                    <option value="yes">Sí</option>
-                  </select>
-                </label>
+              {sourceKind === 'benefit' && (
                 <label>Restricción (opcional)<input value={sourceRestriction} onChange={(event) => setSourceRestriction(event.target.value)} placeholder="Ej. Solo alimentación" /></label>
-              </>}
-              {actionError && <p className="dialog-message" role="alert">{actionError}</p>}
+              )}
+              {error && <p className="dialog-message" role="alert">{error}</p>}
               <button className="button button-primary modal-submit" type="submit" disabled={isSaving}>{isSaving ? 'Guardando…' : 'Guardar fuente'}</button>
             </form>
           ) : dialog === 'bill' ? (
@@ -408,7 +316,7 @@ function App() {
                 </select>
               </label>
               <p className="modal-note">Las cuentas mensuales se generarán para cada mes al abrir tu resumen.</p>
-              {actionError && <p className="dialog-message" role="alert">{actionError}</p>}
+              {error && <p className="dialog-message" role="alert">{error}</p>}
               <button className="button button-primary modal-submit" type="submit" disabled={isSaving}>{isSaving ? 'Guardando…' : 'Agregar cuenta'}</button>
             </form>
           ) : (
@@ -417,7 +325,7 @@ function App() {
                 <span className="modal-input-wrap"><span>$</span><input autoFocus type="number" min="0" step="1" value={balanceInput} onChange={(event) => setBalanceInput(event.target.value)} required /></span>
               </label>
               <p className="modal-note">Se guardará un nuevo registro en tu historial de saldos.</p>
-              {actionError && <p className="dialog-message" role="alert">{actionError}</p>}
+              {error && <p className="dialog-message" role="alert">{error}</p>}
               <button className="button button-primary modal-submit" type="submit" disabled={isSaving}>{isSaving ? 'Guardando…' : 'Guardar saldo'}</button>
             </form>
           )}

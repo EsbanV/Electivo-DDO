@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Icon } from '../components/Icon'
 import { isSupabaseConfigured, requireSupabase } from '../lib/supabase'
-import { clientDiagnostics, describeError } from '../lib/client-diagnostics'
 import '../AuthPage.css'
 
 type AuthMode = 'login' | 'register'
@@ -15,16 +14,12 @@ export function AuthPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const isRegister = mode === 'register'
 
+  // Si ya hay una sesión abierta, pasa directo al resumen.
   useEffect(() => {
     if (!isSupabaseConfigured) return
-    let isCurrent = true
-    requireSupabase().auth.getSession().then(({ data, error }) => {
-      if (error) clientDiagnostics.error('auth.session_check_failed', describeError(error))
-      if (isCurrent && data.session) window.location.replace('/')
-    }).catch((error: unknown) => {
-      clientDiagnostics.error('auth.session_check_crashed', describeError(error))
+    requireSupabase().auth.getSession().then(({ data }) => {
+      if (data.session) window.location.replace('/')
     })
-    return () => { isCurrent = false }
   }, [])
 
   async function submitAuth(event: FormEvent<HTMLFormElement>) {
@@ -32,41 +27,28 @@ export function AuthPage() {
     setNotice('')
     setError('')
     setIsSubmitting(true)
-    const operation = isRegister ? 'auth.signup' : 'auth.login'
 
     try {
-      clientDiagnostics.info('auth.operation.started', { operation })
       const form = new FormData(event.currentTarget)
-      const email = String(form.get('email') ?? '').trim()
-      const password = String(form.get('password') ?? '')
+      const email = String(form.get('email'))
+      const password = String(form.get('password'))
       const client = requireSupabase()
 
       if (isRegister) {
-        const displayName = String(form.get('name') ?? '').trim()
         const { data, error: signUpError } = await client.auth.signUp({
           email,
           password,
-          options: {
-            data: { display_name: displayName },
-            emailRedirectTo: `${window.location.origin}/`,
-          },
+          options: { data: { display_name: String(form.get('name')).trim() } },
         })
         if (signUpError) throw signUpError
-        if (data.session) {
-          clientDiagnostics.info('auth.operation.succeeded', { operation })
-          window.location.assign('/')
-          return
-        }
-        clientDiagnostics.info('auth.operation.succeeded', { operation, confirmationRequired: true })
-        setNotice('Te enviamos un correo para confirmar tu cuenta. Después podrás iniciar sesión.')
+        if (data.session) window.location.assign('/')
+        else setNotice('Te enviamos un correo para confirmar tu cuenta. Después podrás iniciar sesión.')
       } else {
         const { error: signInError } = await client.auth.signInWithPassword({ email, password })
         if (signInError) throw signInError
-        clientDiagnostics.info('auth.operation.succeeded', { operation })
         window.location.assign('/')
       }
     } catch (cause) {
-      clientDiagnostics.error('auth.operation.failed', { operation, ...describeError(cause) })
       setError(cause instanceof Error ? cause.message : 'No pudimos completar el acceso. Inténtalo de nuevo.')
     } finally {
       setIsSubmitting(false)
