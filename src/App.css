@@ -154,8 +154,6 @@ h1 {
 
 .section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
 h2 { font-family: var(--display); font-size: 18px; line-height: 1.2; letter-spacing: -0.2px; font-weight: 600; }
-.section-description, .panel-hint { color: var(--muted); font-size: 14px; }
-.panel-hint { margin-top: 12px; font-size: 13px; }
 .decorative-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: var(--raised); box-shadow: var(--edge-light); color: var(--violet); }
 
 /* ---------- Resumen principal: saldo libre y regla de 30 días ---------- */
@@ -212,7 +210,6 @@ h2 { font-family: var(--display); font-size: 18px; line-height: 1.2; letter-spac
   text-shadow: 0 0 40px rgba(77, 224, 196, 0.45);
 }
 
-.balance-caption { max-width: 60ch; color: var(--muted); font-size: 14px; }
 
 /* Regla: una marca por día, empezando hoy. Las marcas altas son vencimientos. */
 .ruler-block { margin-top: 28px; }
@@ -334,18 +331,17 @@ h2 { font-family: var(--display); font-size: 18px; line-height: 1.2; letter-spac
   font-size: 17px;
   font-weight: 600;
 }
-.form-message { min-height: 22px; margin-top: 10px; color: var(--muted); font-size: 13px; }
+.form-message:empty { display: none; }
+.form-message { margin-top: 10px; color: var(--muted); font-size: 13px; }
 
 /* ---------- Para gastar cada día ---------- */
 
 .daily-guide { display: flex; flex-direction: column; gap: 8px; }
 .daily-guide-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-.daily-guide-tag { color: var(--muted); font-size: 13px; }
 .daily-guide-amount { display: flex; align-items: baseline; gap: 8px; }
 .daily-guide-amount strong { font-family: var(--display); font-size: 32px; font-weight: 700; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
 .daily-guide-amount span { color: var(--muted); font-size: 15px; }
 .daily-guide-formula { font-size: 14px; }
-.daily-guide-note { color: var(--muted); font-size: 13px; }
 
 /* ---------- Ícono de información ---------- */
 

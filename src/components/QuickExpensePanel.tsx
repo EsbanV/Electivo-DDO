@@ -44,7 +44,6 @@ export function QuickExpensePanel({ presets, onAdd }: QuickExpensePanelProps) {
           <InfoTip text="Registra un gasto en dos toques: elige qué fue y escribe el monto. Se agrupa por categoría." />
         </div>
       </div>
-      <p className="section-description">Elige qué fue y escribe el monto.</p>
 
       <div className="quick-choices" role="group" aria-label="Tipo de gasto">
         {presets.map((item) => (
@@ -85,7 +84,7 @@ export function QuickExpensePanel({ presets, onAdd }: QuickExpensePanelProps) {
           {isSaving ? 'Guardando…' : 'Guardar'}
         </button>
       </form>
-      <p className="form-message" aria-live="polite">{message || (presets.length ? 'Queda agrupado por categoría.' : 'No hay accesos rápidos configurados.')}</p>
+      <p className="form-message" aria-live="polite">{message || (presets.length ? '' : 'No hay accesos rápidos configurados.')}</p>
     </section>
   )
 }

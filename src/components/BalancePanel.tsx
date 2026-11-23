@@ -87,14 +87,11 @@ export function BalancePanel({ source, bills, index, total, reserved, onPrevious
 
       <p className="balance-label">
         {isBenefit ? 'Saldo del beneficio' : 'Libre después de tus cuentas'}
-        <InfoTip text="Tu saldo registrado menos las cuentas que aún no pagas. La regla de abajo muestra los próximos 30 días y cuándo vence cada cuenta." />
+        <InfoTip text={isBenefit
+          ? (source.restriction || 'Uso restringido') + '. No se considera para pagar cuentas.'
+          : 'Tu saldo registrado menos las cuentas que aún no pagas. La regla de abajo muestra los próximos 30 días y cuándo vence cada cuenta.'} />
       </p>
       <p className="available-amount"><AnimatedAmount value={available} /></p>
-      <p className="balance-caption">
-        {isBenefit
-          ? (source.restriction || 'Uso restringido') + '. No se considera para pagar cuentas.'
-          : 'Saldo ingresado menos las cuentas asignadas que aún faltan.'}
-      </p>
 
       <ReglaDeDias bills={bills} />
 

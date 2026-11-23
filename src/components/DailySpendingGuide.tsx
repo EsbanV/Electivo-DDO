@@ -28,9 +28,8 @@ export function DailySpendingGuide({ available, source }: {
       <div className="daily-guide-heading">
         <div>
           <h2 id="daily-guide-title">Para gastar cada día</h2>
-          <InfoTip text="Divide tu saldo libre entre los días que quedan del mes, para que sepas cuánto puedes gastar por día." />
+          <InfoTip text={'Divide tu saldo libre entre los días que quedan del mes. Se calcula con el saldo ingresado menos las cuentas pendientes, así que actualiza el saldo cuando cambie.' + (source.kind === 'benefit' ? ' Considera la restricción: ' + (source.restriction || 'uso definido por el beneficio') + '.' : '')} />
         </div>
-        <span className="daily-guide-tag">hasta fin de mes</span>
       </div>
 
       <p className="daily-guide-amount">
@@ -41,11 +40,6 @@ export function DailySpendingGuide({ available, source }: {
         {hasShortfall
           ? 'Las cuentas pendientes superan el saldo registrado.'
           : `${formatCLP(spendable)} disponibles ÷ ${daysRemaining} días, hasta el ${monthEnd}.`}
-      </p>
-      <p className="daily-guide-note">
-        {source.kind === 'benefit'
-          ? `Usa esta referencia considerando la restricción: ${source.restriction || 'uso definido por el beneficio'}.`
-          : 'Se calcula con el saldo ingresado menos las cuentas pendientes. Actualiza el saldo cuando cambie.'}
       </p>
     </section>
   )

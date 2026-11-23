@@ -44,7 +44,7 @@ export function BillsPanel({ bills, source, onAdd, onTogglePaid }: BillsPanelPro
       <div className="section-heading">
         <div>
           <h2 id="bills-title">{isBenefit ? 'Uso de este beneficio' : 'Cuentas por pagar'}</h2>
-          <InfoTip text={isBenefit ? 'Este beneficio tiene un uso restringido y no se descuenta de tus cuentas.' : 'Lista tus cuentas con fecha de vencimiento. Márcalas como pagadas y tu saldo libre se actualiza.'} />
+          <InfoTip text={isBenefit ? 'Este beneficio tiene un uso restringido y no se descuenta de tus cuentas.' : 'Lista tus cuentas con fecha de vencimiento. Márcalas como pagadas y tu saldo libre se actualiza. Los montos son estimados.'} />
         </div>
         <span className="count-pill">{isBenefit ? 'Uso restringido' : pendingCount + ' pendientes'}</span>
       </div>
@@ -102,7 +102,6 @@ export function BillsPanel({ bills, source, onAdd, onTogglePaid }: BillsPanelPro
             <Icon name="plus" size={17} />
             Agregar cuenta
           </button>
-          <p className="panel-hint">Los montos son estimados.</p>
         </>
       )}
       {!isBenefit && !source.canPayBills && (
