@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import confetti from 'canvas-confetti'
 import { formatCLP, formatShortDate } from '../data'
 import { Icon } from './Icon'
+import { InfoTip } from './InfoTip'
 
 // Una cuenta es urgente si vence en 3 días o menos (o ya venció).
 function venceEnPocosDias(dueDate: string) {
@@ -43,6 +44,7 @@ export function BillsPanel({ bills, source, onAdd, onTogglePaid }: BillsPanelPro
       <div className="section-heading">
         <div>
           <h2 id="bills-title">{isBenefit ? 'Uso de este beneficio' : 'Cuentas por pagar'}</h2>
+          <InfoTip text={isBenefit ? 'Este beneficio tiene un uso restringido y no se descuenta de tus cuentas.' : 'Lista tus cuentas con fecha de vencimiento. Márcalas como pagadas y tu saldo libre se actualiza.'} />
         </div>
         <span className="count-pill">{isBenefit ? 'Uso restringido' : pendingCount + ' pendientes'}</span>
       </div>

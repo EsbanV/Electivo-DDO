@@ -1,6 +1,7 @@
 import type { Expense, ExpenseCategory } from '../data'
 import { motion } from 'motion/react'
 import { formatCLP } from '../data'
+import { InfoTip } from './InfoTip'
 
 const colors = ['aqua', 'sky', 'violet', 'coral']
 
@@ -25,6 +26,7 @@ export function SpendingSummary({ expenses, categories, monthLabel }: {
       <div className="section-heading">
         <div>
           <h2 id="spending-title">En qué se fue la plata</h2>
+          <InfoTip text="Muestra cuánto gastaste este mes en cada categoría y qué porcentaje representa del total." />
         </div>
         <span className="month-label">{monthLabel}</span>
       </div>

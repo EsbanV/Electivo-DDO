@@ -2,6 +2,7 @@ import type { Bill, MoneySource } from '../data'
 import { formatCLP, formatShortDate } from '../data'
 import { AnimatedAmount } from './AnimatedAmount'
 import { Icon } from './Icon'
+import { InfoTip } from './InfoTip'
 
 const DIAS_REGLA = 30
 const MS_POR_DIA = 24 * 60 * 60 * 1000
@@ -84,7 +85,10 @@ export function BalancePanel({ source, bills, index, total, reserved, onPrevious
         <span className="estimate-tag"><span />Estimado</span>
       </div>
 
-      <p className="balance-label">{isBenefit ? 'Saldo del beneficio' : 'Libre después de tus cuentas'}</p>
+      <p className="balance-label">
+        {isBenefit ? 'Saldo del beneficio' : 'Libre después de tus cuentas'}
+        <InfoTip text="Tu saldo registrado menos las cuentas que aún no pagas. La regla de abajo muestra los próximos 30 días y cuándo vence cada cuenta." />
+      </p>
       <p className="available-amount"><AnimatedAmount value={available} /></p>
       <p className="balance-caption">
         {isBenefit

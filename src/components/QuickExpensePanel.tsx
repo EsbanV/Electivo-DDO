@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { formatCLP, type QuickExpensePreset } from '../data'
 import { Icon } from './Icon'
+import { InfoTip } from './InfoTip'
 
 type QuickExpensePanelProps = {
   presets: QuickExpensePreset[]
@@ -41,6 +42,7 @@ export function QuickExpensePanel({ presets, onAdd }: QuickExpensePanelProps) {
       <div className="section-heading">
         <div>
           <h2 id="quick-title">Anota un gasto</h2>
+          <InfoTip text="Registra un gasto en dos toques: elige qué fue y escribe el monto. Se agrupa por categoría." />
         </div>
         <span className="decorative-icon"><Icon name="sparkle" size={20} /></span>
       </div>

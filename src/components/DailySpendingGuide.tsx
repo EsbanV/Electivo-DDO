@@ -1,6 +1,7 @@
 import type { MoneySource } from '../data'
 import { formatCLP } from '../data'
 import { AnimatedAmount } from './AnimatedAmount'
+import { InfoTip } from './InfoTip'
 
 function getMonthWindow(date = new Date()) {
   const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
@@ -27,6 +28,7 @@ export function DailySpendingGuide({ available, source }: {
       <div className="daily-guide-heading">
         <div>
           <h2 id="daily-guide-title">Para gastar cada día</h2>
+          <InfoTip text="Divide tu saldo libre entre los días que quedan del mes, para que sepas cuánto puedes gastar por día." />
         </div>
         <span className="daily-guide-tag">hasta fin de mes</span>
       </div>
