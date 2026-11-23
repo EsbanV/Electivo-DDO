@@ -351,16 +351,21 @@ h2 { font-family: var(--display); font-size: 18px; line-height: 1.2; letter-spac
 
 .month-label { color: var(--muted); font-size: 14px; }
 
-.spend-stack { display: flex; height: 12px; overflow: hidden; border-radius: 999px; background: rgba(3, 9, 18, 0.55); box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5); }
-.spend-stack span { min-width: 0; transition: flex-grow 400ms ease; }
-.spend-stack span + span { margin-left: 2px; }
+.spend-body { display: grid; grid-template-columns: 220px 1fr; gap: 32px; align-items: center; }
+.donut { position: relative; width: 220px; height: 220px; }
+.donut svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.donut circle { fill: none; stroke-width: 4.2; stroke-linecap: round; filter: drop-shadow(0 0 2px rgba(77, 224, 196, 0.25)); }
+.donut .donut-track { stroke: rgba(3, 9, 18, 0.55); filter: none; }
+.donut-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.donut-center strong { font-family: var(--display); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.donut-center span { color: var(--muted); font-size: 13px; }
 
-.small-spend-highlight { margin: 16px 0 4px; }
+.small-spend-highlight { margin: 0 0 4px; }
 .small-spend-highlight div { display: flex; align-items: baseline; gap: 10px; }
 .small-spend-highlight span { color: var(--muted); font-size: 14px; }
 .small-spend-highlight strong { font-family: var(--display); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-.category-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 32px; margin: 8px 0 0; padding: 0; list-style: none; }
+.category-list { display: grid; margin: 8px 0 0; padding: 0; list-style: none; }
 .category-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; }
 .category-label { display: flex; align-items: center; gap: 10px; }
 .category-amount { font-family: var(--display); font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -433,6 +438,8 @@ h2 { font-family: var(--display); font-size: 18px; line-height: 1.2; letter-spac
   .dashboard-grid { grid-template-columns: 1fr; }
   .balance-card, .bills-panel, .quick-panel, .daily-guide, .spending-panel { grid-column: 1; grid-row: auto; }
   .page-intro { flex-direction: column; align-items: flex-start; }
+  .spend-body { grid-template-columns: 1fr; justify-items: center; }
+  .spend-side { width: 100%; }
 }
 
 @media (max-width: 600px) {

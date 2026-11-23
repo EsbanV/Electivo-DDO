@@ -51,6 +51,23 @@ body {
     linear-gradient(180deg, var(--night-soft), var(--night) 60%);
   background-attachment: fixed;
 }
+/* Aurora: dos manchas de luz que flotan muy despacio detrás de todo. */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.22;
+  pointer-events: none;
+  animation: aurora 28s ease-in-out infinite alternate;
+}
+body::before { top: -25vmax; left: -15vmax; background: radial-gradient(circle, #1fd1b5, transparent 65%); }
+body::after { right: -20vmax; bottom: -30vmax; background: radial-gradient(circle, #5a6cff, transparent 65%); animation-duration: 36s; }
+@keyframes aurora { to { transform: translate(12vmax, 8vmax) scale(1.15); } }
+
 h1, h2, p { margin: 0; }
 button, input, select { font: inherit; color: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
