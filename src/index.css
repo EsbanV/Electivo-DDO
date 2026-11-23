@@ -19,3 +19,28 @@ body { min-width: 320px; min-height: 100vh; margin: 0; }
 button, input { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
 ::selection { color: #173b31; background: #dce9bc; }
+.app-runtime-error {
+  display: flex;
+  width: min(100% - 40px, 520px);
+  min-height: 100vh;
+  margin: 0 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  color: #25332b;
+}
+.app-runtime-error h1 { margin: 0; font-size: 30px; }
+.app-runtime-error p { max-width: 500px; color: #647066; line-height: 1.6; }
+.runtime-error-button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 16px;
+  background: #355b43;
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}

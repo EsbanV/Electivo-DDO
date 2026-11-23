@@ -2,9 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import { AppErrorBoundary } from './components/AppErrorBoundary'
+import { installClientDiagnostics } from './lib/client-diagnostics'
+
+installClientDiagnostics('dashboard')
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <AppErrorBoundary route="dashboard"><App /></AppErrorBoundary>
   </StrictMode>,
 )

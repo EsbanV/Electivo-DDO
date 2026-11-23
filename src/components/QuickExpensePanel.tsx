@@ -5,16 +5,17 @@ import { Icon } from './Icon'
 
 type QuickExpensePanelProps = {
   presets: QuickExpensePreset[]
-  onAdd: (expense: { label: string; amount: number; categoryId: string; presetId: string }) => void
+  onAdd: (expense: { label: string; amount: number; categoryId: string; presetId: string }) => Promise<void>
 }
 
 export function QuickExpensePanel({ presets, onAdd }: QuickExpensePanelProps) {
   const [selectedId, setSelectedId] = useState('')
   const [amount, setAmount] = useState('')
   const [message, setMessage] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
   const selected = presets.find((item) => item.id === selectedId) ?? presets[0]
 
-  function submitExpense(event: FormEvent<HTMLFormElement>) {
+  async function submitExpense(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const parsedAmount = Number(amount)
     if (!selected || !Number.isFinite(parsedAmount) || parsedAmount <= 0) {
@@ -22,9 +23,17 @@ export function QuickExpensePanel({ presets, onAdd }: QuickExpensePanelProps) {
       return
     }
 
-    onAdd({ label: selected.label, amount: parsedAmount, categoryId: selected.categoryId, presetId: selected.id })
-    setMessage(selected.label + ' guardado: ' + formatCLP(parsedAmount))
-    setAmount('')
+    setIsSaving(true)
+    setMessage('')
+    try {
+      await onAdd({ label: selected.label, amount: parsedAmount, categoryId: selected.categoryId, presetId: selected.id })
+      setMessage(selected.label + ' guardado: ' + formatCLP(parsedAmount))
+      setAmount('')
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No pudimos guardar el gasto.')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -71,10 +80,10 @@ export function QuickExpensePanel({ presets, onAdd }: QuickExpensePanelProps) {
             setMessage('')
           }}
           required
-          disabled={!selected}
+          disabled={!selected || isSaving}
         />
-        <button className="button button-primary save-expense" type="submit" disabled={!selected}>
-          Guardar
+        <button className="button button-primary save-expense" type="submit" disabled={!selected || isSaving}>
+          {isSaving ? 'Guardando…' : 'Guardar'}
         </button>
       </form>
       <p className="form-message" aria-live="polite">{message || (presets.length ? 'El detalle queda agrupado por categoría.' : 'No hay accesos rápidos configurados.')}</p>

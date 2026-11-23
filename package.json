@@ -5,11 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "supabase:start": "supabase start -x studio,imgproxy,storage-api,realtime,edge-runtime,logflare,vector,postgres-meta,mailpit,supavisor",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:reset": "supabase db reset",
+    "supabase:env": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/configure-local-env.ps1",
+    "supabase:push:remote": "supabase db push --remote",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
@@ -19,6 +26,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "oxlint": "^1.90.0",
+    "supabase": "^3.0.0",
     "typescript": "~7.0.2",
     "vite": "^8.3.6"
   }
